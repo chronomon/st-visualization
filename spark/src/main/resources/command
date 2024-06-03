@@ -1,0 +1,41 @@
+查看HBase表文件大小
+flush 'tile:experiment_18_512_1_count'
+flush 'tile:experiment_18_512_1_raw'
+flush 'tile:experiment_18_512_1_pixel'
+flush 'tile:experiment_18_512_1_packet'
+hadoop fs -du -h /apps/hbase/data/data/tile/
+
+
+用图展示：
+20%比较：raw pixel packet的table size  和 fetch consuming（一张图柱状+折线）
+
+
+20%比较：packet不同maxLevel、extent、period下： packet count  和  avg packet size 和 avg packet consuming
+
+
+avgMaxCount
+
+得出结论：数据空间分布稀疏的时候，maxLevel小一些，extent大一些，既能利用包存储的优势，又能保证地图分辨率。
+
+用表展示：
+20% 、40%、60%、80%、100%：packet不同数据量的table size和 fetch consuming  和 count size
+
+
+
+spark-submit --master yarn --deploy-mode cluster --driver-cores 2 --driver-memory 2G --num-executors 15 --executor-cores 2 --executor-memory 6G --class com.jd.st.data.spark.TaxiSparkApp st-visualization.jar 18 512 1
+
+
+
+spark-submit --master yarn --deploy-mode cluster --driver-cores 2 --driver-memory 2G --num-executors 15 --executor-cores 2 --executor-memory 6G --class com.jd.st.data.spark.TaxiImportApp st-visualization.jar 15 512 1
+spark-submit --master yarn --deploy-mode cluster --driver-cores 2 --driver-memory 2G --num-executors 15 --executor-cores 2 --executor-memory 6G --class com.jd.st.data.spark.TaxiImportApp st-visualization.jar 16 512 1
+spark-submit --master yarn --deploy-mode cluster --driver-cores 2 --driver-memory 2G --num-executors 15 --executor-cores 2 --executor-memory 6G --class com.jd.st.data.spark.TaxiImportApp st-visualization.jar 17 512 1
+spark-submit --master yarn --deploy-mode cluster --driver-cores 2 --driver-memory 2G --num-executors 15 --executor-cores 2 --executor-memory 6G --class com.jd.st.data.spark.TaxiImportApp st-visualization.jar 19 512 1
+
+spark-submit --master yarn --deploy-mode cluster --driver-cores 2 --driver-memory 2G --num-executors 15 --executor-cores 2 --executor-memory 6G --class com.jd.st.data.spark.TaxiImportApp st-visualization.jar 18 512 2
+spark-submit --master yarn --deploy-mode cluster --driver-cores 2 --driver-memory 2G --num-executors 15 --executor-cores 2 --executor-memory 6G --class com.jd.st.data.spark.TaxiImportApp st-visualization.jar 18 512 3
+spark-submit --master yarn --deploy-mode cluster --driver-cores 2 --driver-memory 2G --num-executors 15 --executor-cores 2 --executor-memory 6G --class com.jd.st.data.spark.TaxiImportApp st-visualization.jar 18 512 4
+spark-submit --master yarn --deploy-mode cluster --driver-cores 2 --driver-memory 2G --num-executors 15 --executor-cores 2 --executor-memory 6G --class com.jd.st.data.spark.TaxiImportApp st-visualization.jar 18 512 5
+spark-submit --master yarn --deploy-mode cluster --driver-cores 2 --driver-memory 2G --num-executors 15 --executor-cores 2 --executor-memory 6G --class com.jd.st.data.spark.TaxiImportApp st-visualization.jar 18 256 1
+spark-submit --master yarn --deploy-mode cluster --driver-cores 2 --driver-memory 2G --num-executors 15 --executor-cores 2 --executor-memory 6G --class com.jd.st.data.spark.TaxiImportApp st-visualization.jar 18 1024 1
+spark-submit --master yarn --deploy-mode cluster --driver-cores 2 --driver-memory 2G --num-executors 15 --executor-cores 2 --executor-memory 6G --class com.jd.st.data.spark.TaxiImportApp st-visualization.jar 18 2048 1
+spark-submit --master yarn --deploy-mode cluster --driver-cores 2 --driver-memory 2G --num-executors 15 --executor-cores 2 --executor-memory 6G --class com.jd.st.data.spark.TaxiImportApp st-visualization.jar 18 4096 1
