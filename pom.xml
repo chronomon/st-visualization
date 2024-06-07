@@ -9,15 +9,22 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <groupId>com.jd.st-data</groupId>
+    <groupId>com.chronomon.st-data</groupId>
     <artifactId>visualization</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
-        <module>spark</module>
         <module>server</module>
-        <module>storage</module>
+        <module>model</module>
     </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
 </project>

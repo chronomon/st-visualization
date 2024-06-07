@@ -1,0 +1,17 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /st-visualization
+spring:
+  application:
+    name: st-visualization
+  datasource:
+    url: jdbc:postgresql://localhost:5432/st_visualization
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      mode: always
+
+
