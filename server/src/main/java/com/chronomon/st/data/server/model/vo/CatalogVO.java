@@ -38,6 +38,4 @@ public class CatalogVO {
      * 保留的时间片数量：比如最近的1000给时间片
      */
     private Long retentionPeriod;
-
-
 }

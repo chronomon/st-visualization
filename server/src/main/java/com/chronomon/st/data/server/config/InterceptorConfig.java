@@ -21,6 +21,6 @@ public class InterceptorConfig implements WebMvcConfigurer {
         registry.addInterceptor(catalogInterceptor)
                 .order(Ordered.HIGHEST_PRECEDENCE)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/catalog/init");
+                .excludePathPatterns("/catalog/**");
     }
 }

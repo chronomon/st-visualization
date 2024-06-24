@@ -11,8 +11,13 @@ import java.time.Instant;
 @Service
 public class OidBatchServiceImpl extends ServiceImpl<OidBatchMapper, OidBatchPO> implements IOidBatchService {
     @Override
-    public boolean createTable(String catalogName) {
-        return getBaseMapper().createTable("t_user_gps_oid_batch" + "_" + catalogName) > 0;
+    public boolean createTable(String catalogId) {
+        return getBaseMapper().createTable("t_user_gps_oid_batch" + "_" + catalogId) > 0;
+    }
+
+    @Override
+    public boolean dropTable(String catalogId) {
+        return getBaseMapper().dropTable("t_user_gps_oid_batch" + "_" + catalogId) > 0;
     }
 
     @Override

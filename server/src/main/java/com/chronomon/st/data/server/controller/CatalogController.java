@@ -1,9 +1,12 @@
 package com.chronomon.st.data.server.controller;
 
 import com.chronomon.st.data.server.common.ResponseResult;
-import com.chronomon.st.data.server.model.param.OidTemporalQueryParam;
+import com.chronomon.st.data.server.model.vo.CatalogVO;
+import com.chronomon.st.data.server.service.catalog.ICatalogService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
 
 /**
  * 用户目录相关接口
@@ -15,6 +18,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/catalog")
 public class CatalogController {
 
+    @Resource
+    private ICatalogService catalogService;
+
     /**
      * 初始化用户目录
      *
@@ -22,7 +28,7 @@ public class CatalogController {
      * @return 用户目录ID
      */
     @PostMapping("/init")
-    public ResponseResult<String> initCatalog(@RequestBody OidTemporalQueryParam param) {
+    public ResponseResult<String> initCatalog(@RequestBody CatalogVO param) {
         return null;
     }
 

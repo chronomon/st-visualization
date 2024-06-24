@@ -31,8 +31,13 @@ public class TileStatisticServiceImpl extends ServiceImpl<TileStatisticMapper, T
                     .maximumSize(MAX_CACHE_COUNT).build();
 
     @Override
-    public boolean createTable(String catalogName) {
-        return getBaseMapper().createTable("t_user_gps_tile_statistic" + "_" + catalogName) > 0;
+    public boolean createTable(String catalogId) {
+        return getBaseMapper().createTable("t_user_gps_tile_statistic" + "_" + catalogId) > 0;
+    }
+
+    @Override
+    public boolean dropTable(String catalogId) {
+        return getBaseMapper().dropTable("t_user_gps_tile_statistic" + "_" + catalogId) > 0;
     }
 
     @Override
@@ -98,7 +103,7 @@ public class TileStatisticServiceImpl extends ServiceImpl<TileStatisticMapper, T
         List<Instant> missedPeriodList = new ArrayList<>();
         CatalogPO catalogPO = CatalogContext.getCatalog();
         for (Instant periodTime : param.getPeriodTimeList()) {
-            String cacheKey = concatCacheKey(periodTime.getEpochSecond(), catalogPO.getAccessKey());
+            String cacheKey = concatCacheKey(periodTime.getEpochSecond(), catalogPO.getCatalogId());
             TileStatistic tileStatistic = STATISTIC_CACHE.getIfPresent(cacheKey);
             if (tileStatistic == null) {
                 // 缓存中没有命中统计量
@@ -114,7 +119,7 @@ public class TileStatisticServiceImpl extends ServiceImpl<TileStatisticMapper, T
         queryWrapper.in(TileStatisticPO::getPeriodStartTime, missedPeriodList);
         List<TileStatisticPO> missedStatisticPOList = list(queryWrapper);
         for (TileStatisticPO missedTileStatisticPO : missedStatisticPOList) {
-            String cacheKey = concatCacheKey(missedTileStatisticPO.getPeriodStartTime(), catalogPO.getAccessKey());
+            String cacheKey = concatCacheKey(missedTileStatisticPO.getPeriodStartTime(), catalogPO.getCatalogId());
             TileStatistic tileStatistic = new TileStatistic(missedTileStatisticPO.getDataBatch());
             period2TileStatistic.put(Instant.ofEpochSecond(missedTileStatisticPO.getPeriodStartTime()), tileStatistic);
             STATISTIC_CACHE.put(cacheKey, tileStatistic);

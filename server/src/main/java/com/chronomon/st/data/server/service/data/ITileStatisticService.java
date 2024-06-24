@@ -10,7 +10,9 @@ import java.util.Map;
 
 public interface ITileStatisticService extends IService<TileStatisticPO> {
 
-    boolean createTable(String catalogName);
+    boolean createTable(String catalogId);
+
+    boolean dropTable(String catalogId);
 
     Map<Instant, TileStatistic> getTileStatistic(TileTemporalQueryParam param);
 

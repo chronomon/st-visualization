@@ -11,8 +11,13 @@ import java.time.Instant;
 @Service
 public class OidStatisticServiceImpl extends ServiceImpl<OidStatisticMapper, OidStatisticPO> implements IOidStatisticService {
     @Override
-    public boolean createTable(String catalogName) {
-        return getBaseMapper().createTable("t_user_gps_oid_statistic" + "_" + catalogName) > 0;
+    public boolean createTable(String catalogId) {
+        return getBaseMapper().createTable("t_user_gps_oid_statistic" + "_" + catalogId) > 0;
+    }
+
+    @Override
+    public boolean dropTable(String catalogId) {
+        return getBaseMapper().dropTable("t_user_gps_oid_statistic" + "_" + catalogId) > 0;
     }
 
     @Override

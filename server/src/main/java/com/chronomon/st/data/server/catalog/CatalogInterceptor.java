@@ -34,7 +34,7 @@ public class CatalogInterceptor implements HandlerInterceptor {
         }
 
         // 保存用户目录
-        CatalogPO catalogPO = catalogService.getByAccessKey(accessKey);
+        CatalogPO catalogPO = catalogService.getByCatalogId(accessKey);
         if (catalogPO != null) {
             // 校验成功
             CatalogContext.saveCatalog(catalogPO);

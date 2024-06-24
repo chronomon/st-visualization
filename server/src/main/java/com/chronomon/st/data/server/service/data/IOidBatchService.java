@@ -7,7 +7,9 @@ import java.time.Instant;
 
 public interface IOidBatchService extends IService<OidBatchPO> {
 
-    boolean createTable(String catalogName);
+    boolean createTable(String catalogId);
+
+    boolean dropTable(String catalogId);
 
     OidBatchPO getBatch(Instant periodStartTime, String oid);
 }

@@ -16,7 +16,7 @@ public class TableNameHandler implements com.baomidou.mybatisplus.extension.plug
     public String dynamicTableName(String sql, String tableName) {
         if (tableName.startsWith(USER_TABLE_PREFIX)) {
             // 对于用户表，表名字后缀为用户目录
-            return tableName + "_" + CatalogContext.getCatalog().getAccessKey();
+            return tableName + "_" + CatalogContext.getCatalog().getCatalogId();
         } else {
             //对于系统表，表名没有后缀
             return tableName;

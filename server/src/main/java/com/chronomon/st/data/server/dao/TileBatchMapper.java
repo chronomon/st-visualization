@@ -8,11 +8,11 @@ import org.apache.ibatis.annotations.Update;
 
 @Mapper
 public interface TileBatchMapper extends BaseMapper<TileBatchPO> {
-    /**
-     * 创建Tile + 时间片分组的数据包存储表
-     *
-     * @param tableName 表名
-     */
+
     @Update("create table #{tableName} (like t_sys_gps_batch_template including all)")
     int createTable(@Param("tableName") String tableName);
+
+    @Update("drop table #{tableName}")
+    int dropTable(@Param("tableName") String tableName);
+
 }

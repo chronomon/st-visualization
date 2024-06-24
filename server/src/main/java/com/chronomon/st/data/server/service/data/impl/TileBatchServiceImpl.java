@@ -2,6 +2,7 @@ package com.chronomon.st.data.server.service.data.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.chronomon.st.data.model.collection.PeriodTileCollection;
 import com.chronomon.st.data.server.dao.TileBatchMapper;
 import com.chronomon.st.data.server.model.param.TileTemporalQueryParam;
 import com.chronomon.st.data.server.utils.TileEncoder;
@@ -21,8 +22,25 @@ import java.util.stream.Collectors;
 public class TileBatchServiceImpl extends ServiceImpl<TileBatchMapper, TileBatchPO> implements ITileBatchService {
 
     @Override
-    public boolean createTable(String catalogName) {
-        return getBaseMapper().createTable("t_user_gps_tile_batch" + "_" + catalogName) > 0;
+    public boolean createTable(String catalogId) {
+        return getBaseMapper().createTable("t_user_gps_tile_batch" + "_" + catalogId) > 0;
+    }
+
+    @Override
+    public boolean dropTable(String catalogId) {
+        return getBaseMapper().dropTable("t_user_gps_tile_batch" + "_" + catalogId) > 0;
+    }
+
+    @Override
+    public boolean saveFeatures(PeriodTileCollection tileCollection) {
+        String combineIndex = tileCollection.tileLocation.zCurveCode() + "_" + tileCollection.periodStartTime.getEpochSecond();
+        byte[] featureBytes = tileCollection.serializeFeatures();
+
+        TileBatchPO tileBatchPO = new TileBatchPO();
+        tileBatchPO.setCombineIndex(combineIndex);
+        tileBatchPO.setDataBatch(featureBytes);
+
+        return save(tileBatchPO);
     }
 
     @Override

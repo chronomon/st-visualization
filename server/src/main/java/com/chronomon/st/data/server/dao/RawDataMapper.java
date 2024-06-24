@@ -15,4 +15,7 @@ public interface RawDataMapper extends BaseMapper<RawDataPO> {
      */
     @Update("create table #{tableName} (like t_sys_gps_raw_template including all)")
     int createTable(@Param("tableName") String tableName);
+
+    @Update("drop table #{tableName}")
+    int dropTable(@Param("tableName") String tableName);
 }

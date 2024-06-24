@@ -11,4 +11,7 @@ public interface OidStatisticMapper extends BaseMapper<OidStatisticPO> {
 
     @Update("create table #{tableName} (like t_sys_gps_statistic_template including all)")
     int createTable(@Param("tableName") String tableName);
+
+    @Update("drop table #{tableName}")
+    int dropTable(@Param("tableName") String tableName);
 }

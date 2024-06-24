@@ -7,7 +7,9 @@ import java.time.Instant;
 
 public interface IOidStatisticService extends IService<OidStatisticPO> {
 
-    boolean createTable(String catalogName);
+    boolean createTable(String catalogId);
+
+    boolean dropTable(String catalogId);
 
     OidStatisticPO getStatistic(Instant periodStartTime);
 }

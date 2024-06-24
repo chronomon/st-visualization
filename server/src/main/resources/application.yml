@@ -13,5 +13,14 @@ spring:
   sql:
     init:
       mode: always
+  task:
+    execution:
+      thread-name-prefix: async-
+      pool:
+        core-size: 8
+        queue-capacity: 100
+        max-size: 15
+        keep-alive: 60s
+        allow-core-thread-timeout: true
 
 
