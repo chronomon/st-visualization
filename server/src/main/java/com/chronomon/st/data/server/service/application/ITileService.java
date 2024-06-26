@@ -1,4 +1,4 @@
-package com.chronomon.st.data.server.service.tile;
+package com.chronomon.st.data.server.service.application;
 
 
 import com.chronomon.st.data.server.model.param.TileTemporalQueryParam;

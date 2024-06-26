@@ -50,6 +50,19 @@ public class MapDescriptor {
     }
 
     /**
+     * 地图像素坐标转投影坐标
+     *
+     * @param mapFeature 电子地图中的时空对象
+     * @return 投影坐标系下的时空对象
+     */
+    public ProjectFeature convert2ProjectFeature(MapFeature mapFeature) {
+        // 投影坐标转地图的像素坐标
+        double projectX = mapFeature.mapX * resolution + MercatorConvertor.MIN_VALUE;
+        double projectY = MercatorConvertor.MAX_VALUE - mapFeature.mapY * resolution;
+        return new ProjectFeature(mapFeature.oid, mapFeature.time, projectX, projectY);
+    }
+
+    /**
      * 投影坐标转地图像素坐标
      *
      * @param projectFeature 投影坐标系下的时空对象

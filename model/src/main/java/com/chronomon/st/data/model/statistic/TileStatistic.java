@@ -21,7 +21,7 @@ public class TileStatistic {
         deserialize(statisticBytes);
     }
 
-    private byte[] serialize() {
+    public byte[] serialize() {
         if (zVal2Count == null || zVal2Count.isEmpty()) {
             return new byte[0];
         }

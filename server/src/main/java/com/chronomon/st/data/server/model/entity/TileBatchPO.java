@@ -31,7 +31,7 @@ public class TileBatchPO {
     private byte[] dataBatch;
 
     public TileBatchPO(PeriodTileCollection periodTileCollection) {
-        this.combineIndex = periodTileCollection.tileLocation.zCurveCode() + "_" + periodTileCollection.periodStartTime.getEpochSecond();
+        this.combineIndex = periodTileCollection.tileLocation.getZVal() + "_" + periodTileCollection.periodStartTime.getEpochSecond();
         this.dataBatch = periodTileCollection.serializeFeatures();
     }
 

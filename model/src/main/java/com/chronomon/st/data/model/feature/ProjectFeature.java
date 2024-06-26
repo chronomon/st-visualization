@@ -20,4 +20,11 @@ public class ProjectFeature extends BaseFeature {
         this.projectX = projectX;
         this.projectY = projectY;
     }
+
+    public GeodeticFeature toGeodeticFeature() {
+        return new GeodeticFeature(this.oid, this.time,
+                MercatorConvertor.convert2Longitude(projectX),
+                MercatorConvertor.convert2Latitude(projectY)
+        );
+    }
 }

@@ -1,11 +1,11 @@
 package com.chronomon.st.data.server.catalog;
 
+import com.chronomon.st.data.server.compnent.CatalogHolder;
 import com.chronomon.st.data.server.model.entity.CatalogPO;
-import com.chronomon.st.data.server.service.catalog.ICatalogService;
-import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -20,21 +20,23 @@ import javax.servlet.http.HttpServletResponse;
 public class CatalogInterceptor implements HandlerInterceptor {
 
     @Resource
-    private ICatalogService catalogService;
+    private CatalogHolder catalogHolder;
 
     @Override
     public boolean preHandle(HttpServletRequest request,
                              @NonNull HttpServletResponse response,
                              @NonNull Object handler) {
 
-        String accessKey = request.getHeader("Access-Key");
-        if (accessKey == null || accessKey.isEmpty()) {
+        String catalogId = request.getParameter("catalogId");
+        if (catalogId == null || catalogId.isEmpty()) {
             // 用户目录缺失
             return false;
         }
 
+        // 获取用户目录
+        CatalogPO catalogPO = catalogHolder.getCatalog(catalogId);
+
         // 保存用户目录
-        CatalogPO catalogPO = catalogService.getByCatalogId(accessKey);
         if (catalogPO != null) {
             // 校验成功
             CatalogContext.saveCatalog(catalogPO);

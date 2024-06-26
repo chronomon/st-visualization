@@ -17,7 +17,7 @@ public class CatalogVO {
     /**
      * 用户目录访问Key
      */
-    private String accessKey;
+    private String catalogId;
 
     /**
      * 金字塔模型做大层级，[0,20]之间的整数

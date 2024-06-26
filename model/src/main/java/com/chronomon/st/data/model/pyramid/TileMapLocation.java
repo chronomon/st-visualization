@@ -48,17 +48,25 @@ public class TileMapLocation {
      *
      * @return 编码值
      */
-    public long zCurveCode() {
+    public long getZVal() {
         return zCurveEncode(columnNum, rowNum);
     }
 
     @Override
+    public int hashCode() {
+        return Long.hashCode(columnNum + rowNum);
+    }
+
+    @Override
     public boolean equals(Object obj) {
-        if (obj instanceof TileMapLocation) {
+        if (this == obj) {
+            return true;
+        } else if (obj instanceof TileMapLocation) {
             TileMapLocation other = (TileMapLocation) obj;
-            return columnNum == other.columnNum && rowNum == other.rowNum;
+            return this.columnNum == other.columnNum && this.rowNum == other.rowNum;
+        } else {
+            return false;
         }
-        return false;
     }
 
     @Override
@@ -111,5 +119,10 @@ public class TileMapLocation {
         x = (x ^ (x >> 8)) & 0x0000ffff0000ffffL;
         x = (x ^ (x >> 16)) & 0x00000000ffffffffL;
         return (int) x;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(zCurveDecode(32485912720L)[0]);
+        System.out.println(zCurveDecode(32485912720L)[1]);
     }
 }

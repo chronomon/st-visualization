@@ -12,7 +12,9 @@ spring:
     driver-class-name: org.postgresql.Driver
   sql:
     init:
-      mode: always
+      mode: always #服务启动时执行schema.sql
+  main:
+    allow-circular-references: true
   task:
     execution:
       thread-name-prefix: async-

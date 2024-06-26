@@ -1,5 +1,6 @@
 package com.chronomon.st.data.server.controller;
 
+import com.chronomon.st.data.server.catalog.CatalogContext;
 import com.chronomon.st.data.server.common.ResponseResult;
 import com.chronomon.st.data.server.model.vo.CatalogVO;
 import com.chronomon.st.data.server.service.catalog.ICatalogService;
@@ -29,28 +30,17 @@ public class CatalogController {
      */
     @PostMapping("/init")
     public ResponseResult<String> initCatalog(@RequestBody CatalogVO param) {
-        return null;
+        return ResponseResult.success(catalogService.initCatalog(param).getCatalogId());
     }
 
     /**
      * 注销用户目录
      *
-     * @param catalogId 用户目录ID
      * @return 是否注销成功
      */
     @DeleteMapping("/destroy")
-    public ResponseResult<Boolean> destroyCatalog(@RequestParam String catalogId) {
-        return null;
-    }
-
-    /**
-     * 判断用户目录是否存在
-     *
-     * @param catalogId 用户目录ID
-     * @return 目录是否存在
-     */
-    @GetMapping("/exists")
-    public ResponseResult<Boolean> catalogExists(@RequestParam String catalogId) {
-        return null;
+    public ResponseResult<Boolean> destroyCatalog() {
+        String catalogId = CatalogContext.getCatalog().getCatalogId();
+        return ResponseResult.success(catalogService.destroyCatalogById(catalogId));
     }
 }

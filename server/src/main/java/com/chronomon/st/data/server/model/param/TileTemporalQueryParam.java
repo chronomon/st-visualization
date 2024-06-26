@@ -48,7 +48,7 @@ public class TileTemporalQueryParam extends TemporalParam {
         super.bindCatalog(catalogPO);
 
         assert catalogPO.getMaxZoomLevel() >= this.zoomLevel : "层级不合法";
-        this.maxZVal = catalogPO.getMaxZoomLevel();
+        this.maxZoomLevel = catalogPO.getMaxZoomLevel();
         this.tileExtent = catalogPO.getTileExtent();
 
         long scale = (long) Math.pow(4, catalogPO.getMaxZoomLevel() - this.zoomLevel);

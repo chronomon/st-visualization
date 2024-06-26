@@ -27,17 +27,17 @@ public class MapDescriptorTest {
         PyramidModel pyramidModel = new PyramidModel(20, 256);
         MapDescriptor mapDescriptor = pyramidModel.getBottomMapDescriptor();
 
-        URL fileURL = this.getClass().getClassLoader().getResource("gps.txt");
+        URL fileURL = this.getClass().getClassLoader().getResource("gps.csv");
         List<String> lines = Files.readAllLines(Paths.get(fileURL.toURI()));
 
         String oid = "oid";
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         List<MapFeature> mapFeatureList = new ArrayList<>(lines.size());
         for (String line : lines) {
-            String[] attrs = line.split("\t");
-            double lon = Double.parseDouble(attrs[0]);
-            double lat = Double.parseDouble(attrs[1]);
-            Instant time = format.parse(attrs[2]).toInstant();
+            String[] attrs = line.split(",");
+            Instant time = format.parse(attrs[0]).toInstant();
+            double lon = Double.parseDouble(attrs[1]);
+            double lat = Double.parseDouble(attrs[2]);
 
             MapFeature mapFeature = mapDescriptor.convert2MapFeature(new GeodeticFeature(oid, time, lon, lat));
             mapFeatureList.add(mapFeature);

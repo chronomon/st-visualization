@@ -3,12 +3,14 @@ package com.chronomon.st.data.server.model.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
 
 /**
  * 用户表：时间片内不同oid的统计信息表
  *
  * @author wangrubin
  */
+@Data
 @TableName("t_user_gps_oid_statistic")
 public class OidStatisticPO {
     /**

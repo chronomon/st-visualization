@@ -3,6 +3,8 @@ package com.chronomon.st.data.model.collection;
 import com.chronomon.st.data.model.feature.MapFeature;
 import com.chronomon.st.data.model.pyramid.MapDescriptor;
 import com.chronomon.st.data.model.pyramid.TileMapLocation;
+import com.chronomon.st.data.model.statistic.OidStatistic;
+import com.chronomon.st.data.model.statistic.TileStatistic;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -34,7 +36,7 @@ public class PeriodCollection {
     /**
      * 集合不同瓦片的数量统计
      */
-    private Map<TileMapLocation, Integer> tile2Count = null;
+    private Map<Long, Integer> zVal2Count = null;
 
     public PeriodCollection(Instant periodStartTime, List<MapFeature> featureList) {
         this.periodStartTime = periodStartTime;
@@ -55,8 +57,8 @@ public class PeriodCollection {
             featureList.add(mapFeature);
         }
 
-        this.tile2Count = tile2FeatureList.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().size()));
+        this.zVal2Count = tile2FeatureList.entrySet().stream()
+                .collect(Collectors.toMap(entry -> entry.getKey().getZVal(), entry -> entry.getValue().size()));
 
         return tile2FeatureList.entrySet().stream()
                 .map(entry -> new PeriodTileCollection(this.periodStartTime, entry.getKey(), entry.getValue()))
@@ -64,15 +66,15 @@ public class PeriodCollection {
     }
 
     /**
-     * 获取当前时间片内，不同oid对应的时空对象数量
+     * 获取当前时间片内，不同瓦片对应的时空对象数量
      *
-     * @return oid的时空对象数量
+     * @return 基于瓦片的统计量
      */
-    public Map<TileMapLocation, Integer> getTile2Count() {
-        if (tile2Count == null) {
+    public TileStatistic getTileStatistic() {
+        if (zVal2Count == null) {
             throw new RuntimeException("请先调用groupByTile方法");
         }
-        return tile2Count;
+        return new TileStatistic(zVal2Count);
     }
 
     /**
@@ -96,13 +98,13 @@ public class PeriodCollection {
     /**
      * 获取当前时间片内，不同oid对应的时空对象数量
      *
-     * @return oid的时空对象数量
+     * @return 基于OID的统计量
      */
-    public Map<String, Integer> getOid2Count() {
+    public OidStatistic getOidStatistic() {
         if (oid2Count == null) {
             throw new RuntimeException("请先调用groupByOid方法");
         }
-        return oid2Count;
+        return new OidStatistic(oid2Count);
     }
 
     /**

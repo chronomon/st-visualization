@@ -3,6 +3,7 @@ package com.chronomon.st.data.model.collection;
 import com.chronomon.st.data.model.feature.MapFeature;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import jdk.nashorn.internal.objects.annotations.Getter;
 
 import java.io.ByteArrayOutputStream;
 import java.time.Instant;
@@ -33,6 +34,10 @@ public class PeriodOidCollection implements SerializableCollection {
         this.periodStartTime = periodStartTime;
         this.oid = oid;
         this.deserializeFeatures(featureBytes);
+    }
+
+    public List<MapFeature> getFeatureList() {
+        return featureList;
     }
 
     public int size() {

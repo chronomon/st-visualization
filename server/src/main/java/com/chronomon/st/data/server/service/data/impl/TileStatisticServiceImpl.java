@@ -2,42 +2,69 @@ package com.chronomon.st.data.server.service.data.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.chronomon.st.data.model.statistic.TileStatistic;
 import com.chronomon.st.data.server.catalog.CatalogContext;
+import com.chronomon.st.data.server.dao.TileStatisticMapper;
 import com.chronomon.st.data.server.model.entity.CatalogPO;
 import com.chronomon.st.data.server.model.entity.TileStatisticPO;
 import com.chronomon.st.data.server.model.param.TileTemporalQueryParam;
-import com.chronomon.st.data.server.utils.TileEncoder;
+import com.chronomon.st.data.server.service.data.ITileStatisticService;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.chronomon.st.data.server.dao.TileStatisticMapper;
-import com.chronomon.st.data.server.service.data.ITileStatisticService;
-import com.chronomon.st.data.model.feature.PatchFeature;
-import com.chronomon.st.data.model.pyramid.TileMapLocation;
-import com.chronomon.st.data.model.statistic.TileStatistic;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 public class TileStatisticServiceImpl extends ServiceImpl<TileStatisticMapper, TileStatisticPO> implements ITileStatisticService {
 
     private static final long MAX_CACHE_COUNT = 500;
 
+    private static final int EXPIRE_MINUTES = 30;
+
     private static final Cache<String, TileStatistic> STATISTIC_CACHE =
             Caffeine.newBuilder()
-                    .expireAfterAccess(30, TimeUnit.MINUTES)
+                    .expireAfterAccess(EXPIRE_MINUTES, TimeUnit.MINUTES)
                     .maximumSize(MAX_CACHE_COUNT).build();
 
+    // 模板表名
+    private static final String TEMPLATE_TABLE = "t_template_gps_statistic";
+
+    // 用户表名前缀
+    private static final String USER_TABLE_PREFIX = "t_user_gps_tile_statistic_";
+
+    @Resource
+    private DynamicTableService dynamicTableService;
+
     @Override
-    public boolean createTable(String catalogId) {
-        return getBaseMapper().createTable("t_user_gps_tile_statistic" + "_" + catalogId) > 0;
+    public void createTable(String catalogId) {
+        dynamicTableService.createTable(USER_TABLE_PREFIX + catalogId, TEMPLATE_TABLE);
     }
 
     @Override
-    public boolean dropTable(String catalogId) {
-        return getBaseMapper().dropTable("t_user_gps_tile_statistic" + "_" + catalogId) > 0;
+    public void dropTable(String catalogId) {
+        dynamicTableService.dropTable(USER_TABLE_PREFIX + catalogId);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public boolean saveStatistic(Map<Instant, TileStatistic> periodStartTime2TileStatisticMap) {
+        List<TileStatisticPO> tileStatisticPOList = periodStartTime2TileStatisticMap.entrySet().stream()
+                .map(periodStartTime2TileStatistic -> {
+                    TileStatisticPO tileStatisticPO = new TileStatisticPO();
+                    tileStatisticPO.setPeriodStartTime(periodStartTime2TileStatistic.getKey().getEpochSecond());
+                    tileStatisticPO.setDataBatch(periodStartTime2TileStatistic.getValue().serialize());
+                    return tileStatisticPO;
+                }).collect(Collectors.toList());
+        return saveBatch(tileStatisticPOList);
     }
 
     @Override
@@ -56,58 +83,16 @@ public class TileStatisticServiceImpl extends ServiceImpl<TileStatisticMapper, T
         return period2TileStatisticMap;
     }
 
-    @Override
-    public byte[] patchTile(TileTemporalQueryParam param, Map<Instant, TileStatistic> period2TileStatistic) {
-        // 计算像素块所在层级
-        int tileStep = (int) (Math.log(param.getTileExtent()) / Math.log(2));
-        int patchZoomLevel = Math.min(param.getZoomLevel() + tileStep, param.getMaxZoomLevel());
-        int patchZoomLevelStep = param.getMaxZoomLevel() - patchZoomLevel;
-
-        // 聚合不同像素块中的数据量
-        Map<Long, Long> subZ2CountMap = new HashMap<>();
-        for (TileStatistic tileStatistic : period2TileStatistic.values()) {
-            for (Map.Entry<Long, Integer> zValAndCount : tileStatistic.getzVal2Count().entrySet()) {
-                long zVal = zValAndCount.getKey() >> (patchZoomLevelStep * 2);
-                subZ2CountMap.merge(zVal, (long) zValAndCount.getValue(), Long::sum);
-            }
-        }
-
-        // 生成targetLevel级的绝对坐标像素块
-        List<PatchFeature> featureList = new ArrayList<>();
-        int tileZoomLevelStep = patchZoomLevel - param.getZoomLevel();
-        for (Map.Entry<Long, Long> zValAndCount : subZ2CountMap.entrySet()) {
-            int[] columnAndRowNum = TileMapLocation.zCurveDecode(zValAndCount.getKey());
-            int patchColumnNum = columnAndRowNum[0];
-            int patchRowNum = columnAndRowNum[1];
-
-            long patchMinMapX = (long) patchColumnNum * param.getTileExtent();
-            long pathMaxMapX = patchMinMapX + param.getTileExtent();
-            long patchMinMapY = (long) patchRowNum * param.getTileExtent();
-            long patchMaxMapY = patchMinMapY + param.getTileExtent();
-
-            PatchFeature patchFeature = new PatchFeature(zValAndCount.getValue());
-            patchFeature.minMapX = patchMinMapX >> tileZoomLevelStep;
-            patchFeature.maxMapX = pathMaxMapX >> tileZoomLevelStep;
-            patchFeature.minMapY = patchMinMapY >> tileZoomLevelStep;
-            patchFeature.maxMapY = patchMaxMapY >> tileZoomLevelStep;
-
-            featureList.add(patchFeature);
-        }
-
-        // 矢量瓦片编码
-        return TileEncoder.generatePatchTile(featureList, param.getTileMapLocation());
-    }
-
     private Map<Instant, TileStatistic> queryTileStatistic(TileTemporalQueryParam param) {
         Map<Instant, TileStatistic> period2TileStatistic = new HashMap<>();
-        List<Instant> missedPeriodList = new ArrayList<>();
+        List<Long> missedPeriodList = new ArrayList<>();
         CatalogPO catalogPO = CatalogContext.getCatalog();
         for (Instant periodTime : param.getPeriodTimeList()) {
             String cacheKey = concatCacheKey(periodTime.getEpochSecond(), catalogPO.getCatalogId());
             TileStatistic tileStatistic = STATISTIC_CACHE.getIfPresent(cacheKey);
             if (tileStatistic == null) {
                 // 缓存中没有命中统计量
-                missedPeriodList.add(periodTime);
+                missedPeriodList.add(periodTime.getEpochSecond());
             } else {
                 // 缓存中命中了统计量
                 period2TileStatistic.put(periodTime, tileStatistic);
@@ -132,10 +117,10 @@ public class TileStatisticServiceImpl extends ServiceImpl<TileStatisticMapper, T
      * 缓存Key由时间片 + 用户目录组成
      *
      * @param periodTimeSeconds 时间片起始时刻
-     * @param accessKey         用户目录Key
+     * @param catalogId         用户目录Key
      * @return 缓存Key
      */
-    private String concatCacheKey(long periodTimeSeconds, String accessKey) {
-        return String.format("%s_%s", periodTimeSeconds, accessKey);
+    private String concatCacheKey(long periodTimeSeconds, String catalogId) {
+        return String.format("%s_%s", periodTimeSeconds, catalogId);
     }
 }

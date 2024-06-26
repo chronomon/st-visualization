@@ -1,15 +1,20 @@
 package com.chronomon.st.data.server.service.data;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.chronomon.st.data.model.collection.PeriodOidCollection;
+import com.chronomon.st.data.model.feature.MapFeature;
 import com.chronomon.st.data.server.model.entity.OidBatchPO;
+import com.chronomon.st.data.server.model.param.OidTemporalQueryParam;
 
-import java.time.Instant;
+import java.util.List;
 
 public interface IOidBatchService extends IService<OidBatchPO> {
 
-    boolean createTable(String catalogId);
+    void createTable(String catalogId);
 
-    boolean dropTable(String catalogId);
+    void dropTable(String catalogId);
 
-    OidBatchPO getBatch(Instant periodStartTime, String oid);
+    void saveFeatures(List<PeriodOidCollection> oidCollectionList);
+
+    List<MapFeature> getFeaturesByTemporal(OidTemporalQueryParam param);
 }

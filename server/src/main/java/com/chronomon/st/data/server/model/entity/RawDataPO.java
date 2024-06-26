@@ -1,14 +1,17 @@
 package com.chronomon.st.data.server.model.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.chronomon.st.data.model.feature.MapFeature;
+import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * 用户表：原始的时空数据表
  *
  * @author wangrubin
  */
+@Data
 @TableName("t_user_gps_raw")
 public class RawDataPO {
     /**
@@ -22,22 +25,21 @@ public class RawDataPO {
     private Long zVal;
 
     /**
-     * 时间片起始时刻
-     */
-    private LocalDateTime periodStartTime;
-
-    /**
      * 地图横坐标(单位:像素)
      */
-    private Long tileX;
+    private Long mapX;
 
     /**
      * 地图纵坐标(单位:像素)
      */
-    private Long tileY;
+    private Long mapY;
 
     /**
      * 时间片内的相对时间戳
      */
-    private Integer timeOffset;
+    private long time;
+
+    public MapFeature toMapFeature() {
+        return new MapFeature(oid, Instant.ofEpochSecond(time), mapX, mapY);
+    }
 }

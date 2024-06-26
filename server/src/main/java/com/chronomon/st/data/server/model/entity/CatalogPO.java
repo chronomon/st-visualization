@@ -2,6 +2,7 @@ package com.chronomon.st.data.server.model.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
+
 import java.time.LocalDateTime;
 
 /**
@@ -44,13 +45,12 @@ public class CatalogPO {
     private String periodUnit;
 
     /**
-     * 最近一次归档的时间片结束时刻
+     * 下一次待归档的时间片
      */
-    private LocalDateTime lastRollTime;
+    private Long nextRollPeriod;
 
     /**
      * 创建时间
      */
-    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 }

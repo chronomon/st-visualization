@@ -34,6 +34,11 @@ public class TemporalParam {
         this.endTime = endTime;
     }
 
+    /**
+     * 关联到对应的用户目录中定义的元数据
+     *
+     * @param catalogPO 用户目录元数据
+     */
     public void bindCatalog(CatalogPO catalogPO) {
         ChronoUnit periodUnit = ChronoUnit.valueOf(catalogPO.getPeriodUnit());
         this.periodTimeList = new ArrayList<>();
@@ -47,6 +52,11 @@ public class TemporalParam {
         }
     }
 
+    /**
+     * 查询条件是否已到最小粒度
+     *
+     * @return true是，false否
+     */
     public boolean isMinGrainSize() {
         return periodTimeList.size() == 1;
     }
